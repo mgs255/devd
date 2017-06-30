@@ -83,6 +83,14 @@ func main() {
 		Default("false").
 		Bool()
 
+	openPath := kingpin.Flag(
+		"path",
+		"Path to open in browser - only applies if \"open\" is also specifed",
+	).
+		Short('O').
+		Default().
+		String()
+
 	port := kingpin.Flag(
 		"port",
 		"Port to listen on - if not specified, devd will auto-pick a sensible port",
@@ -258,6 +266,10 @@ func main() {
 		logger,
 		func(url string) {
 			if *openBrowser {
+				if len(*openPath) > 0 {
+					url = url + "/" + *openPath
+					logger.Say("Opening: %s", url)
+				}
 				err := webbrowser.Open(url)
 				if err != nil {
 					kingpin.Fatalf("Failed to open browser: %s", err)
